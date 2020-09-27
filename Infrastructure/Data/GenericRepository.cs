@@ -28,7 +28,8 @@ namespace Infrastructure.Data
 
          public async Task<T> GetEntityWithSpec(ISpecification<T> spec)
         {
-            return await ApplySpecification(spec).FirstAsync();
+            //First Async throws exception in EF with error "Enumerator failed to MoveNextAsync."
+            return await ApplySpecification(spec).FirstOrDefaultAsync();
         }
 
         public async Task<IReadOnlyList<T>> ListAllAsync()

@@ -9,6 +9,8 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    //Get Swagger to ignore this controller
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
