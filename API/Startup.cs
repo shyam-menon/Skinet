@@ -34,6 +34,17 @@ namespace API
 
             //Add Swagger using the extention method for it
             services.AddSwaggerDocumentation();
+
+            //Add CORS support by adding a CORS header "Access-control-Allow-Origin" that will 
+            //allow it to display information if the client is request from a secured port i.e.
+            //the origin from where we are allowed to access the resource from
+            services.AddCors(opt => 
+            {
+                opt.AddPolicy("CorsPolicy", policy => 
+                {
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200");
+                });
+            });
             
         }
 
@@ -54,6 +65,9 @@ namespace API
 
             //To serve static content
             app.UseStaticFiles();
+
+            //Set up CORS policy
+            app.UseCors("CorsPolicy");
 
             app.UseAuthorization();
 
