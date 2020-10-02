@@ -2,6 +2,7 @@ import { ShopService } from './../shop.service';
 import { IProduct } from './../../shared/models/product';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { BreadcrumbService } from 'xng-breadcrumb';
 
 @Component({
   selector: 'app-product-details',
@@ -11,7 +12,10 @@ import { ActivatedRoute } from '@angular/router';
 export class ProductDetailsComponent implements OnInit {
   product: IProduct;
 
-  constructor(private shopService: ShopService, private activatedRoute: ActivatedRoute) { }
+  constructor(private shopService: ShopService, private activatedRoute: ActivatedRoute, 
+              private bcService: BreadcrumbService) {
+    this.bcService.set('@productDetails', ' ');
+  }
 
   ngOnInit(): void {
     this.loadProduct();
@@ -22,6 +26,8 @@ export class ProductDetailsComponent implements OnInit {
       // The + in front is to cast the string into a number
       this.shopService.getProduct(+this.activatedRoute.snapshot.paramMap.get('id')).subscribe(product => {
         this.product = product;
+        // Set the bread crumb as the product name
+        this.bcService.set('@productDetails', product.name);
       }, error => {
         console.log(error);
       });
