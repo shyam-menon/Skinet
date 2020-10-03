@@ -16,6 +16,10 @@ namespace Infrastructure.Data
         public DbSet<ProductBrand> ProductBrands { get; set; }
         public DbSet<ProductType> ProductTypes { get; set; }
 
+        //Db set in case basket needs to be stored into DB instead of Redis
+        //Comment : Storing basket in database instead of Redis
+        public DbSet<Basket> Baskets { get; set; }
+
         //This method is responsible for creating the migration and we can override this for the behavior that we need
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
