@@ -16,6 +16,10 @@ namespace API.Helpers
             
             //Create map for address. Course item 176
             CreateMap<Address, AddressDto>().ReverseMap();
+
+            //Create map for customer basket and basket item. Course item 182
+            CreateMap<CustomerBasketDto, CustomerBasket>();
+            CreateMap<BasketItemDto, BasketItem>();
         }
     }
 }
