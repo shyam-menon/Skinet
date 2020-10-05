@@ -1,7 +1,10 @@
 using System;
 using System.Threading.Tasks;
+using Core.Entities.Identity;
 using Infrastructure.Data;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +29,13 @@ namespace API
 
                    //Seed the database
                    await StoreContextSeed.SeedAsync(context, loggerFactory);
+
+                   //Set up Identity. 167 course item
+                   var userManager = services.GetRequiredService<UserManager<AppUser>>();
+                   var identityContext = services.GetRequiredService<AppIdentityDbContext>(); 
+
+                   await identityContext.Database.MigrateAsync();
+                   await AppIdentityDbContextSeed.SeedUserAsync(userManager);
                }
                catch(Exception ex)
                {

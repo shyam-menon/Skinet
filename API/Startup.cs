@@ -3,6 +3,7 @@ using API.Helpers;
 using API.Middleware;
 using AutoMapper;
 using Infrastructure.Data;
+using Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,12 @@ namespace API
             services.AddAutoMapper(typeof(MappingProfiles));
             services.AddControllers();
             services.AddDbContext<StoreContext>(x => x.UseSqlite
-            (Configuration.GetConnectionString("DefaultConnection"))); 
+            (Configuration.GetConnectionString("DefaultConnection")));
+            //DB Context for Identity
+            services.AddDbContext<AppIdentityDbContext>(x => 
+            {
+                x.UseSqlite(Configuration.GetConnectionString("IdentityConnection"));
+            });
 
             //Add Redis connection as Singleton as it is shared and reused among callers            
             services.AddSingleton<IConnectionMultiplexer>(c => {
@@ -38,6 +44,9 @@ namespace API
 
             //Add the services that we need using an extension method
             services.AddApplicationServices();
+
+            //Add Identity service and authentication. 166 course item.
+            services.AddIdentityServices(Configuration);
 
             //Add Swagger using the extention method for it
             services.AddSwaggerDocumentation();
@@ -76,6 +85,8 @@ namespace API
             //Set up CORS policy
             app.UseCors("CorsPolicy");
 
+            //Set up authentication and authorization
+            app.UseAuthentication();
             app.UseAuthorization();
 
             //Configure Swagger
