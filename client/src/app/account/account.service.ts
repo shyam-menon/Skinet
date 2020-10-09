@@ -1,3 +1,4 @@
+import { IAddress } from './../shared/models/address';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, ReplaySubject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -68,5 +69,14 @@ export class AccountService {
 
   checkEmailExists(email: string): Observable<object> {
     return this.http.get(this.baseUrl + 'account/emailexists?email=' + email);
+  }
+
+  // Populate user address if it exists. Course item 242
+  getUserAddress(): Observable<IAddress>{
+    return this.http.get<IAddress>(this.baseUrl + 'account/address');
+  }
+
+  updateUserAddress(address: IAddress): Observable<IAddress> {
+    return this.http.put<IAddress>(this.baseUrl + 'account/address', address);
   }
 }
