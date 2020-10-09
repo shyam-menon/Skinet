@@ -26,6 +26,9 @@ namespace Infrastructure.Services
             //get basket from the repo
             var basket = await _basketRepo.GetBasketAsync(basketId);
 
+            //when the delivery method is not set then set it to free shipping
+            if (deliveryMethodId == 0) deliveryMethodId = 4;
+
             //get the items from the product repo
             var items = new List<OrderItem>();
             foreach (var item in basket.Items)
