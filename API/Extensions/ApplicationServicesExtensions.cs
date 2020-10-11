@@ -12,6 +12,10 @@ namespace API.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            //Cache service needs to be singleton as this needs to be set up once and reused throughout 
+            // the application life cycle. Course item 280
+            services.AddSingleton<IResponseCacheService, ResponseCacheService>();
+
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IPaymentService, PaymentService>();

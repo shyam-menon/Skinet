@@ -36,6 +36,7 @@ namespace API.Controllers
             return basket;
         }
 
+        // Use - stripe listen -f https://localhost:5001/api/payments/webhook
         [HttpPost("webhook")]
         public async Task<ActionResult> StripeWebhook()
         {

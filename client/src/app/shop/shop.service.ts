@@ -3,7 +3,7 @@ import { IType } from './../shared/models/productType';
 import { IBrand } from './../shared/models/brands';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { IPagination } from '../shared/models/pagination';
 import { map } from 'rxjs/operators';
 import { IProduct } from '../shared/models/product';
@@ -13,6 +13,9 @@ import { IProduct } from '../shared/models/product';
 })
 export class ShopService {
   baseUrl = 'https://localhost:5001/api/';
+  products: IProduct[] = [];
+  brands: IBrand[] = [];
+  types: IType[] = [];
 
   constructor(private http: HttpClient) { }
 
@@ -39,20 +42,46 @@ export class ShopService {
       // use RxJS to project the response body to IPagination
       .pipe(
         map(response => {
+          // client side caching. Course item 283
+          this.products = response.body.data;
           return response.body;
         })
       );
   }
 
   getProduct(id: number): Observable<IProduct> {
+    const product = this.products.find(p => p.id === id);
+    // client side caching. Course item 283
+    if (product) {
+      return of(product);
+    }
+
     return this.http.get<IProduct>(this.baseUrl + 'products/' + id);
   }
 
   getBrands(): Observable<IBrand[]> {
-    return this.http.get<IBrand[]>(this.baseUrl + 'products/brands');
+    // client side caching. Course item 283
+    if (this.brands.length > 0) {
+      return of(this.brands);
+    }
+    return this.http.get<IBrand[]>(this.baseUrl + 'products/brands').pipe(
+      map(response => {
+        this.brands = response;
+        return response;
+      })
+    );
   }
 
   getTypes(): Observable<IType[]> {
-    return this.http.get<IType[]>(this.baseUrl + 'products/types');
+    // client side caching. Course item 283
+    if (this.types.length > 0) {
+      return of(this.types);
+    }
+    return this.http.get<IType[]>(this.baseUrl + 'products/types').pipe(
+      map(response => {
+        this.types = response;
+        return response;
+      })
+    );
   }
 }
