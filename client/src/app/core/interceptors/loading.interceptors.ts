@@ -14,6 +14,11 @@ export class LoadingInterceptor implements HttpInterceptor {
         if (req.method === 'POST' && req.url.includes('orders')) {
             return next.handle(req);
         }
+
+        // Turn off loading indicator when deleting. Course item 286
+        if (req.method === 'DELETE') {
+            return next.handle(req);
+        }
         // Whitelist the async email validator. Course item 202
         if (req.url.includes('emailexists')) {
             return next.handle(req);
