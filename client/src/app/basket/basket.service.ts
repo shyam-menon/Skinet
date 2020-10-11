@@ -21,10 +21,25 @@ export class BasketService {
 
   constructor(private http: HttpClient) { }
 
+  // Create the payment intent. Course item 262
+  createPaymentIntent(): Observable<void> {
+    return this.http.post(this.baseUrl + 'payments/' + this.getCurrentBasketValue().id, {})
+    .pipe(
+      map((basket: IBasket) => {
+        this.basketSource.next(basket);
+      })
+    );
+  }
+
   // Calculate the shipping price. Course item 244
   setShippingPrice(deliveryMethod: IDeliveryMethod): void {
     this.shipping = deliveryMethod.price;
+    const basket = this.getCurrentBasketValue();
+    // Update basket with the shipping information. Course item 261
+    basket.deliveryMethodId = deliveryMethod.id;
+    basket.shippingPrice = deliveryMethod.price;
     this.calculateTotals();
+    this.setBasket(basket);
   }
 
   getBasket(id: string): Observable<void> {
@@ -32,6 +47,7 @@ export class BasketService {
     .pipe(
       map((basket: IBasket) => {
         this.basketSource.next(basket);
+        this.shipping = basket.shippingPrice;
         // calculate the totals when you get the basket
         this.calculateTotals();
       })

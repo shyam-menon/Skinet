@@ -13,10 +13,13 @@ namespace Infrastructure.Services
       
         private readonly IBasketRepository _basketRepo;      
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPaymentService _paymentService;
 
-        public OrderService(IBasketRepository basketRepo, IUnitOfWork unitOfWork)
+        public OrderService(IBasketRepository basketRepo, IUnitOfWork unitOfWork, IPaymentService
+        paymentService)
         {
-            _unitOfWork = unitOfWork;            
+            _unitOfWork = unitOfWork;
+            _paymentService = paymentService;
             _basketRepo = basketRepo;           
         }
 
@@ -48,18 +51,27 @@ namespace Infrastructure.Services
             //calc subtotal
             var subtotal = items.Sum(item => item.Price * item.Quantity);
 
+            // check to see if order exists. Course item 270
+            var spec = new OrderByPaymentIntentIdSpecification(basket.PaymentIntentId);
+            var existingOrder = await _unitOfWork.Repository<Order>().GetEntityWithSpec(spec);
+
+            if (existingOrder != null)
+            {
+                _unitOfWork.Repository<Order>().Delete(existingOrder);
+                // Update the payment intent before creating a replacement order. Good practice when
+                // adjusting order or even when changing items in basket
+                await _paymentService.CreateOrUpdatePaymentIntent(basket.PaymentIntentId);
+            }
+
             //create order
-            var order = new Order(items, buyerEmail, shippingAddress, deliveryMethod, subtotal);
+            var order = new Order(items, buyerEmail, shippingAddress, deliveryMethod, subtotal, basket.PaymentIntentId);
             _unitOfWork.Repository<Order>().Add(order);
 
             //save to db. Course item 219
             var result = await _unitOfWork.Complete();
 
             //Save was not successful. UOW takes care of rolling back the transaction
-            if (result <= 0) return null;
-
-            //delete the basket if the order was saved
-            await _basketRepo.DeleteBasketAsync(basketId);
+            if (result <= 0) return null;      
 
             //return order
             return order;
