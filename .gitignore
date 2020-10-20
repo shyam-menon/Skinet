@@ -4,3 +4,7 @@ appsettings.json
 *.db
 *.rdb
 payment_intent.succeeded.json
+*.manifest
+*.testlog
+
+
