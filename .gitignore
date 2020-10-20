@@ -8,3 +8,4 @@ payment_intent.succeeded.json
 *.testlog
 
 
+/.vs/skinet/v16/.suo

@@ -28,7 +28,12 @@ namespace ApiTest.Hooks
         [BeforeScenario]
         public void TestSetup()
         {
+            //During development with API server
             _settings.BaseUrl = new Uri("http://localhost:3000/");
+
+            //After development of the API
+            //settings.BaseUrl = new Uri("https://localhost:5001/api/");
+
             _settings.RestClient.BaseUrl = _settings.BaseUrl;
         }
 

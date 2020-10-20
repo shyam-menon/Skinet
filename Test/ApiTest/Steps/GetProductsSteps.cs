@@ -49,8 +49,7 @@ namespace ApiTest.Steps
 
         [Then(@"I should see count of products greater than (.*)")]
         public void ThenIShouldSeeCountOfProductsGreaterThan(int zeroProducts)
-        {
-            var content = _settings.Response.Content;
+        {          
 
             var productList = new JsonDeserializer().Deserialize<List<Dictionary<string, string>>>(_settings.Response);
 

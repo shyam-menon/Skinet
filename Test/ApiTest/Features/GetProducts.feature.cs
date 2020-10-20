@@ -93,15 +93,15 @@ namespace ApiTest.Features
         }
         
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Verify producttype of the products")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Verify producttype of the product 18")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "GetProducts")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("products")]
-        public virtual void VerifyProducttypeOfTheProducts()
+        public virtual void VerifyProducttypeOfTheProduct18()
         {
             string[] tagsOfScenario = new string[] {
                     "products"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Verify producttype of the products", null, tagsOfScenario, argumentsOfScenario);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Verify producttype of the product 18", null, tagsOfScenario, argumentsOfScenario);
 #line 7
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -170,7 +170,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("I perform operation for products", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 15
- testRunner.Then("I should see count of products greater than 1", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I should see count of products greater than 0", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
