@@ -5,6 +5,8 @@ using Core.Entities;
 using Core.Entities.OrderAggregate;
 using Core.Interfaces;
 using Core.Specification;
+using Infrastructure.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services
 {
@@ -14,13 +16,15 @@ namespace Infrastructure.Services
         private readonly IBasketRepository _basketRepo;      
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPaymentService _paymentService;
+        private readonly ILogger _logger;
 
         public OrderService(IBasketRepository basketRepo, IUnitOfWork unitOfWork, IPaymentService
-        paymentService)
+        paymentService, ILoggerFactory loggerFactory)
         {
             _unitOfWork = unitOfWork;
             _paymentService = paymentService;
-            _basketRepo = basketRepo;           
+            _basketRepo = basketRepo;
+            _logger = loggerFactory.CreateLogger("Orders");
         }
 
         public async Task<Order> CreateOrderAsync(string buyerEmail, int deliveryMethodId, string basketId,
@@ -65,6 +69,9 @@ namespace Infrastructure.Services
 
             //create order
             var order = new Order(items, buyerEmail, shippingAddress, deliveryMethod, subtotal, basket.PaymentIntentId);
+
+            // Create a log event with an event Id
+            _logger.LogInformation(LogEvents.OrderCreation,"SERVICE ENTRY: Creating a new order: {Order}", order);
             _unitOfWork.Repository<Order>().Add(order);
 
             //save to db. Course item 219
@@ -91,6 +98,8 @@ namespace Infrastructure.Services
 
         public async Task<IReadOnlyList<Order>> GetOrdersForUserAsync(string buyerEmail)
         {
+            _logger.LogInformation("SERVICE ENTRY: Inside get orders for user.");
+
             var spec = new OrdersWithItemsAndOrderingSpecification(buyerEmail);
 
             return await _unitOfWork.Repository<Order>().ListAsync(spec);

@@ -8,8 +8,10 @@ using API.Extensions;
 using AutoMapper;
 using Core.Entities.OrderAggregate;
 using Core.Interfaces;
+using Infrastructure.Events;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
@@ -19,32 +21,43 @@ namespace API.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IMapper _mapper;
-        public OrdersController(IOrderService orderService, IMapper mapper)
+        private readonly ILogger _logger;
+
+        public OrdersController(IOrderService orderService, IMapper mapper, ILoggerFactory loggerFactory)
         {
             _mapper = mapper;
             _orderService = orderService;
+            _logger = loggerFactory.CreateLogger("Orders");
         }
 
         //Create the order. Course item 214
         [HttpPost]
         public async Task<ActionResult<Order>> CreateOrder(OrderDto orderDto)
         {
-            var email = HttpContext.User.RetrieveEmailFromPrincipal();
+            using (_logger.BeginScope("Constructing a new order for {First Name} : {LastName})"
+                   , orderDto.ShipToAddress.FirstName, orderDto.ShipToAddress.LastName))
+            {
+                _logger.LogInformation("API ENTRY: Creating a new order");
 
-            var address = _mapper.Map<AddressDto, Address>(orderDto.ShipToAddress);
+                var email = HttpContext.User.RetrieveEmailFromPrincipal();
 
-            var order = await _orderService.CreateOrderAsync(email, orderDto.DeliveryMethodId, 
-            orderDto.BasketId, address);
+                var address = _mapper.Map<AddressDto, Address>(orderDto.ShipToAddress);
 
-            if (order == null) return BadRequest(new ApiResponse(400, "Problem creating order"));
+                var order = await _orderService.CreateOrderAsync(email, orderDto.DeliveryMethodId,
+                orderDto.BasketId, address);
 
-            return Ok(order);
+                if (order == null) return BadRequest(new ApiResponse(400, "Problem creating order"));
+
+                return Ok(order);
+            }           
         }
 
         //Get the order. Course item 222
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetOrdersForUser()
         {
+            _logger.LogInformation("API ENTRY: Inside get orders for user.");
+
             var email = HttpContext.User.RetrieveEmailFromPrincipal();
 
             var orders = await _orderService.GetOrdersForUserAsync(email);

@@ -6,6 +6,7 @@ using Core.Entities.OrderAggregate;
 using Core.Interfaces;
 using Core.Specification;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Stripe;
 using Order = Core.Entities.OrderAggregate.Order;
 using Product = Core.Entities.Product;
@@ -17,13 +18,16 @@ namespace Infrastructure.Services
     {
         private readonly IBasketRepository _basketRepository;
         private readonly IUnitOfWork _unitOfWork;
-         private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger _logger;
+
         public PaymentService(IBasketRepository basketRepository, IUnitOfWork unitOfWork,       
-        IConfiguration configuration)
+        IConfiguration configuration, ILogger<PaymentService> logger)
         {
             _configuration = configuration;
             _unitOfWork = unitOfWork;
             _basketRepository = basketRepository;
+            _logger = logger;
         }
 
         public async Task<CustomerBasket> CreateOrUpdatePaymentIntent(string basketId)
@@ -65,6 +69,7 @@ namespace Infrastructure.Services
                 // then intent may already be available and the client makes a change after checkout
                 if (string.IsNullOrEmpty(basket.PaymentIntentId))
                 {
+                    _logger.LogDebug("SERVICE ENTRY: Creating new Payment intent Id");
                     var options = new PaymentIntentCreateOptions
                     {
                         // Converting from decimal to long needs multiplication by 100
@@ -83,6 +88,7 @@ namespace Infrastructure.Services
                 // Update the payment intent
                 else
                 {
+                    _logger.LogDebug("SERVICE ENTRY: Updating existing Payment intent Id {PaymentIntentId}", basket.PaymentIntentId);
                     var options = new PaymentIntentUpdateOptions
                     {
                         Amount = (long) basket.Items.Sum(i => i.Quantity * (i.Price * 100)) 

@@ -1,15 +1,21 @@
 using API.Extensions;
 using API.Helpers;
+using API.Infrastructure;
 using API.Middleware;
+using API.Middleware.EnchancedLogs;
 using AutoMapper;
 using Infrastructure.Data;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
+using System;
+using System.Data.SqlClient;
 
 namespace API
 {
@@ -61,14 +67,26 @@ namespace API
                     policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200");
                 });
             });
-            
+
+            //Add filter to log performance
+            services.AddSingleton<IScopeInformation, ScopeInformation>();
+            services.AddMvc(options =>
+            {              
+                options.Filters.Add(typeof(TrackActionPerformanceFilter));
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             //Use custom exception middleware instead of the default
-            app.UseMiddleware<ExceptionMiddleware>();
+            //app.UseMiddleware<ExceptionMiddleware>();
+            app.UseApiExceptionHandler(options =>
+            {
+                options.AddResponseDetails = UpdateApiErrorResponse;
+                options.DetermineLogLevel = DetermineLogLevel;
+            });
 
             //When request comes to API server for which there is no endpoint that matches the request
             //redirect to errors controller passing in the status code and in errors controller return
@@ -97,5 +115,28 @@ namespace API
                 endpoints.MapControllers();
             });
         }
+
+        private LogLevel DetermineLogLevel(Exception ex)
+        {
+            //Log critical level error for specific conditions and error level for others
+            if (ex.Message.StartsWith("cannot open database", StringComparison.InvariantCultureIgnoreCase) ||
+                ex.Message.StartsWith("a network-related", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return LogLevel.Critical;
+            }
+            return LogLevel.Error;
+        }
+
+        //This allows addition of additional details into the log based on the type of the exception
+
+        private void UpdateApiErrorResponse(HttpContext context, Exception ex, ApiError error)
+        {
+            if (ex.GetType().Name == nameof(SqlException))
+            {
+                error.Detail = "Exception was a database exception!";
+            }
+            //error.Links = "https://gethelpformyerror.com/";
+        }
     }
+
 }

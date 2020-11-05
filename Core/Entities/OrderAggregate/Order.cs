@@ -38,5 +38,9 @@ namespace Core.Entities.OrderAggregate
             return Subtotal;
         }
 
+        public override string ToString()
+        {
+            return $"BuyerEmail: {BuyerEmail}; OrderDate: {OrderDate};";
+        }
     }
 }
