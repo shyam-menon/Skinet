@@ -1,9 +1,15 @@
 using API.Extensions;
+using API.GraphQl.Queries;
+using API.GraphQl.Schemas;
+using API.GraphQl.Types;
 using API.Helpers;
 using API.Infrastructure;
 using API.Middleware;
 using API.Middleware.EnchancedLogs;
 using AutoMapper;
+using GraphiQl;
+using GraphQL.Server;
+using GraphQL.Types;
 using Infrastructure.Data;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
@@ -46,7 +52,20 @@ namespace API
                 var configuration = ConfigurationOptions.Parse(Configuration.GetConnectionString("Redis"),
                 true);
                 return ConnectionMultiplexer.Connect(configuration);
-            });          
+            });
+
+            //Add GraphQL types, queries,schemas and mutations. 
+            services.AddSingleton<BasketItemType>();
+            services.AddSingleton<CustomerBasketType>();
+            services.AddScoped<CustomerBasketQuery>();
+            services.AddScoped<RootQuery>();
+            services.AddScoped<ISchema,RootSchema>();
+            //Add GraphQL service
+            services.AddGraphQL(options =>
+            {
+                //start time, end time, duration etc are included in the response if the metrics is enabled
+                options.EnableMetrics = false;
+            }).AddSystemTextJson();
 
             //Add the services that we need using an extension method
             services.AddApplicationServices();
@@ -87,6 +106,10 @@ namespace API
                 options.AddResponseDetails = UpdateApiErrorResponse;
                 options.DetermineLogLevel = DetermineLogLevel;
             });
+
+            //Enable support for Graph QL playground at this endpoint and use the schema defined
+            app.UseGraphiQl("/graphql");
+            app.UseGraphQL<ISchema>();
 
             //When request comes to API server for which there is no endpoint that matches the request
             //redirect to errors controller passing in the status code and in errors controller return
