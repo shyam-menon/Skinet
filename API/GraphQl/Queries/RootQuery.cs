@@ -14,7 +14,8 @@ namespace API.GraphQl.Queries
         //Keep adding queries to the root query
         public RootQuery(IBasketRepository basketRepository)
         {
-            Field<CustomerBasketQuery>("basketQuery", resolve: context => new { });            
+            Field<CustomerBasketQuery>("basketQuery", resolve: context => new { });
+            //Field<CustomerBasketComplexQuery>("basketItemQuery", resolve: context => new { });
         }
     }
 }
