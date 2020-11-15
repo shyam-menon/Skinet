@@ -12,8 +12,8 @@ namespace API.Infrastructure
 
         static LogMessages()
         {
-            _routePerformance = LoggerMessage.Define<string, string, long>(LogLevel.Trace, 0,
-                "{RouteName} {Method} code took {ElapsedMilliseconds}.");
+            _routePerformance = LoggerMessage.Define<string, string, long>(LogLevel.Information, 0,
+                "{RouteName} {Method} code took {ElapsedMilliseconds} ms.");
         }
 
         public static void LogRoutePerformance(this ILogger logger, string pageName, string method,

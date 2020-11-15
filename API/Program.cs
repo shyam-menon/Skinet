@@ -29,8 +29,8 @@ namespace API
         {
             Log.Logger = new LoggerConfiguration()
                .ReadFrom.Configuration(Configuration)
-               .WriteTo.File(new JsonFormatter(), @"c:\temp\logs\skinet.json", shared: true)
-               .WriteTo.Seq("http://localhost:5342")
+               //.WriteTo.File(new JsonFormatter(), @"c:\temp\logs\skinet.json", shared: true)
+               //.WriteTo.Seq("http://localhost:5342")
                .CreateLogger();
 
             Log.Information("Starting Skinet web host");
