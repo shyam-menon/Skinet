@@ -102,7 +102,7 @@
               "./node_modules/ngx-bootstrap/datepicker/bs-datepicker.css",
               "./node_modules/bootswatch/dist/united/bootstrap.min.css",
               "./node_modules/ngx-toastr/toastr.css",
-              "src/styles.scss"              
+              "src/styles.scss"
             ],
             "scripts": []
           }
@@ -135,5 +135,8 @@
       }
     }
   },
-  "defaultProject": "client"
+  "defaultProject": "client",
+  "cli": {
+    "analytics": false
+  }
 }

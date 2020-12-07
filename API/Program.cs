@@ -29,7 +29,8 @@ namespace API
         {
             Log.Logger = new LoggerConfiguration()
                .ReadFrom.Configuration(Configuration)
-               //.WriteTo.File(new JsonFormatter(), @"c:\temp\logs\skinet.json", shared: true)
+               .WriteTo.File(new JsonFormatter(), @"c:\temp\logs\skinet.json", shared: true)
+               .WriteTo.EventCollector("http://localhost:8088/services/collector", "45bc694e-2f75-4d24-bc01-a8a85891afd6")
                //.WriteTo.Seq("http://localhost:5342")
                .CreateLogger();
 
