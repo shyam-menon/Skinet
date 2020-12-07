@@ -10,3 +10,4 @@ payment_intent.succeeded.json
 
 /.vs/skinet/v16/.suo
 /.vs/skinet/DesignTimeBuild/.dtbcache.v2
+/.vs/skinet/config/applicationhost.config
